@@ -11,20 +11,10 @@ import upload from "../middleware/multerMiddleware.js";
 
 const router = express.Router();
 
-router.post(
-  "/create",
-  protectRoute,
-  upload.fields([
-    {
-      name: "cover",
-      maxCount: 1,
-    },
-  ]),
-  createBook
-);
+router.post("/create", protectRoute, upload.single("image"), createBook);
 router.get("/get", protectRoute, getBooks);
 router.get("/get/:id", protectRoute, getBookById);
-router.patch("/update/:id", protectRoute, updateBook);
+router.patch("/update/:id", protectRoute, upload.single("image"), updateBook);
 router.delete("/delete/:id", protectRoute, deleteBook);
 
 export default router;

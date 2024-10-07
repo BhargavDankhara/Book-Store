@@ -1,6 +1,5 @@
 import { Book } from "../models/book.model.js";
-import upload from "../middleware/multerMiddleware.js";
-import { uplodeOnCloudinary } from "../utils/cloudinary.js";
+import fs from "fs";
 
 export async function createBook(req, res) {
   const {
@@ -15,17 +14,9 @@ export async function createBook(req, res) {
     tags,
     rating,
   } = req.body;
-  const image = req.file ? req.file.path : null;
+  const image = req.file ? `/uploads/${req.file.filename}` : null; // Store the image URL
 
   try {
-    let imageUrl = null;
-    if (image) {
-      const response = await uplodeOnCloudinary(image);
-      if (response) {
-        imageUrl = response.secure_url;
-      }
-    }
-
     const newBook = new Book({
       title,
       author,
@@ -37,7 +28,7 @@ export async function createBook(req, res) {
       availableCopies,
       tags,
       rating,
-      image: imageUrl,
+      image,
     });
 
     await newBook.save();
@@ -87,7 +78,7 @@ export async function updateBook(req, res) {
     tags,
     rating,
   } = req.body;
-  const image = req.file ? req.file.path : null;
+  const image = req.file ? `/uploads/${req.file.filename}` : null;
 
   try {
     let book = await Book.findById(req.params.id);
@@ -95,12 +86,10 @@ export async function updateBook(req, res) {
       return res.status(404).json({ msg: "Book not found" });
     }
 
-    let imageUrl = book.image;
-    if (image) {
-      const response = await uplodeOnCloudinary(image);
-      if (response) {
-        imageUrl = response.secure_url;
-      }
+    // Delete old image if new image is uploaded
+    if (image && book.image) {
+      const oldImagePath = book.image.replace("/uploads/", "");
+      fs.unlinkSync(`uploads/${oldImagePath}`);
     }
 
     book = await Book.findByIdAndUpdate(
@@ -116,7 +105,7 @@ export async function updateBook(req, res) {
         availableCopies,
         tags,
         rating,
-        image: imageUrl,
+        image,
       },
       { new: true }
     );
@@ -138,10 +127,10 @@ export async function deleteBook(req, res) {
       return res.status(404).json({ msg: "Book not found" });
     }
 
-    // Delete image from Cloudinary if exists
+    // Delete image if exists
     if (book.image) {
-      const publicId = book.image.split("/").pop().split(".")[0];
-      await cloudinary.uploader.destroy(publicId);
+      const imagePath = book.image.replace("/uploads/", "");
+      fs.unlinkSync(`uploads/${imagePath}`);
     }
 
     await book.deleteOne();
