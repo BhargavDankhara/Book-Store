@@ -28,7 +28,6 @@ A full-stack web application for managing and browsing books in a book store. Th
   - Flowbite React
   - React Router
   - Axios
-  - React Toastify
 
 - **Backend**:
   - Node.js
@@ -38,11 +37,12 @@ A full-stack web application for managing and browsing books in a book store. Th
   - JWT for authentication
   - Bcrypt for password hashing
 
-- **Deployment**:
-  - Render (for backend)
-  - Vercel or Netlify (for frontend)
+- **.env**
+  - MONGO_URI=your_mongodb_connection_string
+  - JWT_SECRET=your_jwt_secret
+  - NODE_ENV=
+  - PORT=
 
-## Installation
 
 ### Prerequisites
 
