@@ -1,4 +1,4 @@
-﻿# Bool-Store
+
 # Book Store Application
 
 A full-stack web application for managing and browsing books in a book store. The application includes user authentication, book management, and filtering functionalities.
